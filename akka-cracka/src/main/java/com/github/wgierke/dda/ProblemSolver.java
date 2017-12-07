@@ -3,8 +3,8 @@ package com.github.wgierke.dda;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import com.github.wgierke.dda.actors.Master;
-import com.github.wgierke.dda.actors.Reader;
-import com.github.wgierke.dda.messages.CrackMessage;
+import com.github.wgierke.dda.actors.Writer;
+import com.github.wgierke.dda.messages.AnalyseStudentsMessage;
 import com.github.wgierke.dda.messages.ShutdownMessage;
 
 public class ProblemSolver {
@@ -28,13 +28,19 @@ public class ProblemSolver {
     }
 
     private static void runCracker() {
-        System.out.println("Running Password CrackMessage :)");
+        System.out.println("Running Password AnalyseStudentsMessage :)");
         final ActorSystem actorSystem = ActorSystem.create("Cracker");
-        // TODO change this to real listener
-        ActorRef listener = actorSystem.actorOf(Reader.props());
+        ActorRef listener = actorSystem.actorOf(Writer.props(System.out));
         ActorRef master = actorSystem.actorOf(Master.props(listener));
 
-        master.tell(new CrackMessage(), ActorRef.noSender());
+        master.tell(new AnalyseStudentsMessage(), ActorRef.noSender());
+
+        try {
+            Thread.sleep(10 * 1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         master.tell(new ShutdownMessage(), ActorRef.noSender());
     }
 
