@@ -17,7 +17,6 @@ import java.util.List;
 
 public class Reader extends AbstractLoggingActor {
     private void parseCSV(CSVFileMessage csvMessage) {
-        this.log().info("Working dir: " + System.getProperty("user.dir"));
         this.log().info("Parsing CSV file " + csvMessage.getFilePath());
         BufferedReader reader;
         try {
@@ -44,10 +43,10 @@ public class Reader extends AbstractLoggingActor {
 
                 int id = Integer.parseInt(cols[0]);
                 String name = cols[1];
-                String password = cols[2];
+                String hash = cols[2];
                 String genes = cols[3].trim();
-                students.add(new Student(id, name, password, genes));
-                this.log().info("Parsed student: " + id);
+                students.add(new Student(id, name, hash, genes));
+                this.log().debug("Parsed student: " + id);
 
                 line = reader.readLine();
             } while (line != null);

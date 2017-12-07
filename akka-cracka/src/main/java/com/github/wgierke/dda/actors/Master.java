@@ -6,7 +6,9 @@ import akka.actor.Props;
 import com.github.wgierke.dda.Student;
 import com.github.wgierke.dda.messages.*;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class Master extends AbstractLoggingActor {
@@ -14,6 +16,11 @@ public class Master extends AbstractLoggingActor {
     final private ActorRef reader;
     final private ActorRef cracker;
     final private ActorRef geneChecker;
+
+    private Set<Student> genesMatched = new HashSet<>();
+    private Set<Student> passwordCracked = new HashSet<>();
+
+    private int numStudents = -1;
 
     private Master(ActorRef listener) {
         this.listener = listener;
@@ -27,20 +34,43 @@ public class Master extends AbstractLoggingActor {
         return receiveBuilder()
                 .match(AnalyseStudentsMessage.class, this::analyse)
                 .match(CSVResultMessage.class, this::passOnCSVResult)
+                .match(GenesMatchedMessage.class, this::updateGenesMatched)
+                .match(PasswordCrackedMessage.class, this::updatePasswordCracked)
                 .match(ShutdownMessage.class, this::shutdown)
                 .matchAny(object -> this.log().info(this.getClass().getName() + " received unknown message: " + object.toString()))
                 .build();
     }
 
+    private void updateGenesMatched(GenesMatchedMessage genesMatchedMessage) {
+        genesMatched.add(genesMatchedMessage.getStudent());
+        this.listener.tell(genesMatchedMessage, this.getSelf());
+        this.check_is_finished();
+    }
+
+    private void updatePasswordCracked(PasswordCrackedMessage passwordCrackedMessage) {
+        passwordCracked.add(passwordCrackedMessage.getStudent());
+        this.listener.tell(passwordCrackedMessage, this.getSelf());
+        this.check_is_finished();
+    }
+
+    private void check_is_finished() {
+        if (this.genesMatched.size() == this.numStudents && this.passwordCracked.size() == this.numStudents) {
+            this.log().info("Master is finished");
+            this.getSelf().tell(new ShutdownMessage(), ActorRef.noSender());
+        }
+    }
+
 
     private void analyse(AnalyseStudentsMessage analyseStudentsMessage) {
-        this.log().info("Received AnalyseStudentsMessage message");
+        this.log().debug("Received AnalyseStudentsMessage message");
         this.reader.tell(new CSVFileMessage("./students.csv"), this.getSelf());
     }
 
     private void passOnCSVResult(CSVResultMessage csvResultMessage) {
-        this.log().info("Received CSVResultMessage");
+        this.log().debug("Received CSVResultMessage");
         List<Student> students = csvResultMessage.getStudents();
+        this.numStudents = students.size();
+
         String[] genes = students.stream().map(Student::getGenes).collect(Collectors.toList()).toArray(new String[0]);
 
         for (Student student : students) {

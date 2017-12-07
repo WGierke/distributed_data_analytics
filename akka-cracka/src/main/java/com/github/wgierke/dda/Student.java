@@ -3,13 +3,13 @@ package com.github.wgierke.dda;
 public class Student {
     final private int id;
     final private String name;
-    final private String password;
+    final private String hash;
     final private String genes;
 
-    public Student(int id, String name, String password, String genes) {
+    public Student(int id, String name, String hash, String genes) {
         this.id = id;
         this.name = name;
-        this.password = password;
+        this.hash = hash;
         this.genes = genes;
     }
 
@@ -22,8 +22,8 @@ public class Student {
         return name;
     }
 
-    public String getPassword() {
-        return password;
+    public String getHash() {
+        return hash;
     }
 
     public String getGenes() {

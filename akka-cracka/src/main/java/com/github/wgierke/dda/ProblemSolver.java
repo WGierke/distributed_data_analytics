@@ -35,13 +35,13 @@ public class ProblemSolver {
 
         master.tell(new AnalyseStudentsMessage(), ActorRef.noSender());
 
-        try {
-            Thread.sleep(10 * 1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        master.tell(new ShutdownMessage(), ActorRef.noSender());
+//        try {
+//            Thread.sleep(10 * 1000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//
+//        master.tell(new ShutdownMessage(), ActorRef.noSender());
     }
 
     private static void runGeneChecker() {
