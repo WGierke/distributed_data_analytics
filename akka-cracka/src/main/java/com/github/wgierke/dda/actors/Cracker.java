@@ -23,7 +23,7 @@ public class Cracker extends AbstractLoggingActor {
             }
         }
 
-        this.getSender().tell(new PasswordCrackedMessage(student, student.getPassword()), this.getSelf());
+        this.getSender().tell(new PasswordCrackedMessage(student), this.getSelf());
     }
 
     @Override

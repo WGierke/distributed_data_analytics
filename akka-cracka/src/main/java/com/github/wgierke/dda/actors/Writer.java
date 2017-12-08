@@ -39,15 +39,14 @@ public class Writer extends AbstractLoggingActor {
     private void writePasswordCracked(PasswordCrackedMessage passwordCrackedMessage) {
         Student student = passwordCrackedMessage.getStudent();
         String message = "Password cracked for student " + student.getName() + " (ID: " + student.getId() + ")\n\t" +
-                "Hash: " + student.getHash() + " --> Password: " + passwordCrackedMessage.getPassword() + "\n";
+                "Hash: " + student.getHash() + " --> Password: " + student.getPassword() + "\n";
         this.write(message);
     }
 
     private void writeGenesMatched(GenesMatchedMessage genesMatchedMessage) {
         Student student = genesMatchedMessage.getStudent();
         String message = "Genes matched for student " + student.getName() + " (ID: " + student.getId() + ")\n\t" +
-                "Gene partner ID: " + genesMatchedMessage.getMatchId() + " - Longest gene match: " + "xxx" + "\n";
-                "Gene partner ID: " + genesMatchedMessage.getMatchId() + " - Longest gene match: " + genesMatchedMessage.getLongestMatch() + "\n";
+                "Gene partner ID: " + student.getGenePartner() + " - Longest gene match: " + student.getLongestGeneMatch() + "\n";
         this.write(message);
     }
 

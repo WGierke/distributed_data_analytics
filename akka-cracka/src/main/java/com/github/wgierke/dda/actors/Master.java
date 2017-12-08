@@ -6,9 +6,10 @@ import akka.actor.Props;
 import com.github.wgierke.dda.Student;
 import com.github.wgierke.dda.messages.*;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Master extends AbstractLoggingActor {
@@ -56,10 +57,34 @@ public class Master extends AbstractLoggingActor {
     private void check_is_finished() {
         if (this.genesMatched.size() == this.numStudents && this.passwordCracked.size() == this.numStudents) {
             this.log().info("Master is finished");
+            try {
+                writeResultsToCsv();
+            } catch (IOException e) {
+                System.out.println("An error occurred while trying to persist the solution:");
+                e.printStackTrace();
+            }
             this.getSelf().tell(new ShutdownMessage(), ActorRef.noSender());
         }
     }
 
+    private void writeResultsToCsv() throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("./solution.csv"))) {
+            String[] header = {"ID", "Student", "Password", "Gene_Partner", "Longest_Gene_Match"};
+            writer.write(String.join(",", header));
+            writer.newLine();
+            for (Student student : this.passwordCracked) {
+                ArrayList<String> values = new ArrayList<>();
+                values.add(String.valueOf(student.getId()));
+                values.add(student.getName());
+                values.add(student.getPassword());
+                values.add(String.valueOf(student.getGenePartner()));
+
+                values.add(student.getLongestGeneMatch());
+                writer.write(String.join(",", values));
+                writer.newLine();
+            }
+        }
+    }
 
     private void analyse(AnalyseStudentsMessage analyseStudentsMessage) {
         this.log().debug("Received AnalyseStudentsMessage message");
