@@ -1,6 +1,6 @@
 package com.github.wgierke.dda;
 
-public class Student {
+public class Student implements Comparable {
     final private int id;
     final private String name;
     final private String hash;
@@ -48,4 +48,9 @@ public class Student {
     public void setGenePartner(Integer genePartner) { this.genePartner = genePartner; }
 
     public void setLongestGeneMatch(String longestGeneMatch) { this.longestGeneMatch = longestGeneMatch; }
+
+    public int compareTo(Object o) {
+        int anotherStudentId = ((Student) o).getId();
+        return this.getId() - anotherStudentId;
+    }
 }

@@ -74,7 +74,9 @@ public class Master extends AbstractLoggingActor {
             String[] header = {"ID", "Student", "Password", "Gene_Partner", "Longest_Gene_Match"};
             writer.write(String.join(",", header));
             writer.newLine();
-            for (Student student : this.passwordCracked) {
+            ArrayList<Student> studentArrayList = new ArrayList<>(this.passwordCracked);
+            Collections.sort(studentArrayList);
+            for (Student student : studentArrayList) {
                 ArrayList<String> values = new ArrayList<>();
                 values.add(String.valueOf(student.getId()));
                 values.add(student.getName());
