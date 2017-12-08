@@ -17,17 +17,19 @@ public class Master extends AbstractLoggingActor {
     final private ActorRef reader;
     final private ActorRef cracker;
     final private ActorRef geneChecker;
+    final private String studentsFilePath;
 
     private Set<Student> genesMatched = new HashSet<>();
     private Set<Student> passwordCracked = new HashSet<>();
 
     private int numStudents = -1;
 
-    private Master(ActorRef listener) {
+    private Master(ActorRef listener, String studentsFilePath) {
         this.listener = listener;
         this.reader = this.getContext().actorOf(Reader.props());
         this.cracker = this.getContext().actorOf(Cracker.props());
         this.geneChecker = this.getContext().actorOf(GeneChecker.props());
+        this.studentsFilePath = studentsFilePath;
     }
 
     @Override
@@ -88,7 +90,7 @@ public class Master extends AbstractLoggingActor {
 
     private void analyse(AnalyseStudentsMessage analyseStudentsMessage) {
         this.log().debug("Received AnalyseStudentsMessage message");
-        this.reader.tell(new CSVFileMessage("./students.csv"), this.getSelf());
+        this.reader.tell(new CSVFileMessage(this.studentsFilePath), this.getSelf());
     }
 
     private void passOnCSVResult(CSVResultMessage csvResultMessage) {
@@ -104,8 +106,8 @@ public class Master extends AbstractLoggingActor {
         }
     }
 
-    public static Props props(ActorRef listener) {
-        return Props.create(Master.class, () -> new Master(listener));
+    public static Props props(ActorRef listener, String studentsFilePath) {
+        return Props.create(Master.class, () -> new Master(listener, studentsFilePath));
     }
 
     private void shutdown(ShutdownMessage shutdownMessage) {
