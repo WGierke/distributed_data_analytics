@@ -7,10 +7,12 @@ import java.io.Serializable;
 public class GenesMatchedMessage implements Serializable {
     final private Student student;
     final private int matchId;
+    final private String longestMatch;
 
-    public GenesMatchedMessage(Student student, final int matchId) {
+    public GenesMatchedMessage(Student student, final int matchId, final String longestMatch) {
         this.student = student;
         this.matchId = matchId;
+        this.longestMatch = longestMatch;
     }
 
     public Student getStudent() {
@@ -20,4 +22,6 @@ public class GenesMatchedMessage implements Serializable {
     public int getMatchId() {
         return matchId;
     }
+
+    public String getLongestMatch() { return longestMatch; }
 }

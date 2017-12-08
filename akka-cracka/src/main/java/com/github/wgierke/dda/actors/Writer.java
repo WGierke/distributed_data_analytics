@@ -47,6 +47,7 @@ public class Writer extends AbstractLoggingActor {
         Student student = genesMatchedMessage.getStudent();
         String message = "Genes matched for student " + student.getName() + " (ID: " + student.getId() + ")\n\t" +
                 "Gene partner ID: " + genesMatchedMessage.getMatchId() + " - Longest gene match: " + "xxx" + "\n";
+                "Gene partner ID: " + genesMatchedMessage.getMatchId() + " - Longest gene match: " + genesMatchedMessage.getLongestMatch() + "\n";
         this.write(message);
     }
 

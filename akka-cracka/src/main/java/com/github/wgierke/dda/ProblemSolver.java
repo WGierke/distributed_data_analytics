@@ -46,6 +46,11 @@ public class ProblemSolver {
 
     private static void runGeneChecker() {
         System.out.println("Running Gene Check :)");
+        final ActorSystem actorSystem = ActorSystem.create("GeneChecker");
+        ActorRef listener = actorSystem.actorOf(Writer.props(System.out));
+        ActorRef master = actorSystem.actorOf(Master.props(listener));
+
+        master.tell(new AnalyseStudentsMessage(), ActorRef.noSender());
     }
 
     private static void runAll() {
