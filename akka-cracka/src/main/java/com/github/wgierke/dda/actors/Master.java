@@ -3,6 +3,7 @@ package com.github.wgierke.dda.actors;
 import akka.actor.AbstractLoggingActor;
 import akka.actor.ActorRef;
 import akka.actor.Props;
+import akka.routing.RoundRobinPool;
 import com.github.wgierke.dda.Student;
 import com.github.wgierke.dda.messages.*;
 
@@ -15,9 +16,9 @@ import java.util.stream.Collectors;
 public class Master extends AbstractLoggingActor {
     final private ActorRef listener;
     final private ActorRef reader;
-    final private ActorRef cracker;
-    final private ActorRef geneChecker;
     final private String studentsFilePath;
+    private final ActorRef crackerRouter;
+    private final ActorRef geneCheckerRouter;
 
     private Set<Student> genesMatched = new HashSet<>();
     private Set<Student> passwordCracked = new HashSet<>();
@@ -27,9 +28,21 @@ public class Master extends AbstractLoggingActor {
     private Master(ActorRef listener, String studentsFilePath) {
         this.listener = listener;
         this.reader = this.getContext().actorOf(Reader.props());
-        this.cracker = this.getContext().actorOf(Cracker.props());
-        this.geneChecker = this.getContext().actorOf(GeneChecker.props());
         this.studentsFilePath = studentsFilePath;
+
+        int numProcessors = Runtime.getRuntime().availableProcessors();
+        int numWorkers = (numProcessors / 2) + 1;
+
+        this.crackerRouter = this.buildCrackerWorkers(numWorkers);
+        this.geneCheckerRouter = this.buildGeneCheckerWorkers(numWorkers);
+    }
+
+    private ActorRef buildCrackerWorkers(int numWorkers) {
+        return this.getContext().actorOf(new RoundRobinPool(numWorkers).props(Cracker.props()));
+    }
+
+    private ActorRef buildGeneCheckerWorkers(int numWorkers) {
+        return this.getContext().actorOf(new RoundRobinPool(numWorkers).props(GeneChecker.props()));
     }
 
     @Override
@@ -103,8 +116,8 @@ public class Master extends AbstractLoggingActor {
         String[] genes = students.stream().map(Student::getGenes).collect(Collectors.toList()).toArray(new String[0]);
 
         for (Student student : students) {
-            this.cracker.tell(new CrackerMessage(student), this.getSelf());
-            this.geneChecker.tell(new GeneCheckForStudentMessage(student, genes), this.getSelf());
+            this.crackerRouter.tell(new CrackerMessage(student), this.getSelf());
+            this.geneCheckerRouter.tell(new GeneCheckForStudentMessage(student, genes), this.getSelf());
         }
     }
 
