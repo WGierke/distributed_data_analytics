@@ -18,7 +18,7 @@ public class GeneChecker extends AbstractLoggingActor {
             if (i == student.getId()) {
                 continue;
             }
-            String substring = longestCommonSubstring(genes[student.getId()], genes[i]);
+            String substring = longestCommonSubstring(student.getGenes(), genes[i]);
             if (substring.length() > longestSequence.length()) {
                 longestSequence = substring;
                 genePartner = i;

@@ -16,14 +16,14 @@ public class Cracker extends AbstractLoggingActor {
         Student student = crackerMessage.getStudent();
         this.log().debug("Received crack challenge for student " + student.getName() + " (ID: " + student.getId() + ")");
 
+        String studentHash = student.getHash();
         for(int i = 1000000; i <= 9999999; i++) {
-            if(Objects.equals(student.getHash(), hash(String.valueOf(i)))) {
+            if (studentHash.equals(hash(String.valueOf(i)))) {
                 student.setPassword(String.valueOf(i));
-                break;
+                this.getSender().tell(new PasswordCrackedMessage(student), this.getSelf());
+                return;
             }
         }
-
-        this.getSender().tell(new PasswordCrackedMessage(student), this.getSelf());
     }
 
     @Override
@@ -43,17 +43,17 @@ public class Cracker extends AbstractLoggingActor {
         try {
             digest = MessageDigest.getInstance("SHA-256");
         } catch (NoSuchAlgorithmException e) {
-            System.out.println("SHA-256 is not supported :-(");
+            System.out.println("SHA-256 is not supported :(");
         }
         byte[] hashedBytes = new byte[0];
         try {
             hashedBytes = digest.digest(line.getBytes("UTF-8"));
         } catch (UnsupportedEncodingException e) {
-            System.out.println("SHA-256 encoding is not supported :-(");
+            System.out.println("SHA-256 encoding is not supported :(");
         }
-        StringBuffer stringBuffer = new StringBuffer();
+        StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < hashedBytes.length; i++)
-            stringBuffer.append(Integer.toString((hashedBytes[i] & 0xff) + 0x100, 16).substring(1));
-        return stringBuffer.toString();
+            stringBuilder.append(Integer.toString((hashedBytes[i] & 0xff) + 0x100, 16).substring(1));
+        return stringBuilder.toString();
     }
 }

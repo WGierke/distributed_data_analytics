@@ -11,12 +11,6 @@ import com.github.wgierke.dda.messages.WriteMessage;
 import java.io.OutputStream;
 
 public class Writer extends AbstractLoggingActor {
-    private final OutputStream out;
-
-    private Writer(OutputStream out) {
-        this.out = out;
-    }
-
     @Override
     public Receive createReceive() {
         return receiveBuilder()
@@ -50,8 +44,8 @@ public class Writer extends AbstractLoggingActor {
         this.write(message);
     }
 
-    public static Props props(OutputStream out) {
-        return Props.create(Writer.class, () -> new Writer(out));
+    public static Props props() {
+        return Props.create(Writer.class);
     }
 
     private void shutdown(ShutdownMessage shutdownMessage) {
