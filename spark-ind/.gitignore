@@ -1,0 +1,9 @@
+# Unzipped csv files
+TPCH/
+
+# idea
+.idea/
+*.iml
+
+# compiled stuff
+target/
