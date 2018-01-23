@@ -1,4 +1,4 @@
-package de.hpi.spark_tutorial
+package com.github.wgierke.spark_ind
 
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql._
@@ -16,11 +16,11 @@ object INDFinder extends App {
     var cores = 4
     var file_path = "TPCH"
 
-    for(i <- 0 until args.length - 1){
-      if(args(i) == "--path"){
+    for(i <- 0 until args.length - 1) {
+      if (args(i) == "--path") {
         file_path = args(i + 1)
       }
-      if(args(i) == "--cores"){
+      if (args(i) == "--cores") {
         cores = args(i + 1).toInt
       }
     }
@@ -32,7 +32,7 @@ object INDFinder extends App {
 
     val sparkSession = sparkBuilder.getOrCreate()
     import sparkSession.implicits._
-    
+
     println($"Solving $file_path on $cores cores")
 
     val files = List(
@@ -78,28 +78,5 @@ object INDFinder extends App {
     val strings = aggregatedINDs.collect().map(ind => $"""${ind._1} < ${ind._2.mkString(", ")}""".toString()).sorted
 
     strings.foreach(println)
-
-
-
-
-//    val tableCells = tables.map(table => {
-//      table.map(row => {
-//        row.schema.fieldNames.zipWithIndex.map{
-//          case (columnName, idx) => (row.get(idx).toString.trim, ListBuffer[String](columnName))
-//        }
-//      })
-//    })
-//
-//    val unifiedCells = tableCells.reduce((a, b) => a.union(b)).flatMap(x => x).rdd
-//
-//    val attributeSets = unifiedCells.reduceByKey((a, b) => a ++= b).map(_._2.distinct) // (unifiedCells.partitions.length * 1.5).asInstanceOf[Int]
-//
-//    val inclusionLists = attributeSets.flatMap(attrSet => attrSet.map(col => (col, attrSet.filter(!_.equals(col)))))
-//
-//    val aggregatedINDs = inclusionLists.reduceByKey((a, b) => a.intersect(b)).filter(_._2.nonEmpty)
-//
-//    val strings = aggregatedINDs.collect().map(ind => $"""${ind._1} < ${ind._2.mkString(", ")}""".toString()).sorted
-//
-//    strings.foreach(println)
   }
 }
