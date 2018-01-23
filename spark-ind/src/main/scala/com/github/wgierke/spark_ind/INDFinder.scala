@@ -28,6 +28,20 @@ object SparkIND extends App {
     Logger.getLogger("org").setLevel(Level.OFF)
     Logger.getLogger("akka").setLevel(Level.OFF)
 
+    var cores = 4
+    var file_path = "TPCH"
+
+    for( i <- 0 until args.length-1){
+      if(args(i) == "--path"){
+        file_path = args(i+1)
+      }
+      if(args(i) == "--cores"){
+        cores = args(i+1).toInt
+      }
+    }
+
+    println("Solving " + file_path + " on " + cores + " cores")
+
     //------------------------------------------------------------------------------------------------------------------
     // Lamda basics (for Scala)
     //------------------------------------------------------------------------------------------------------------------
@@ -65,7 +79,7 @@ object SparkIND extends App {
     val sparkBuilder = SparkSession
       .builder()
       .appName("fINDer")
-      .master("local[4]") // local, with 4 worker cores
+      .master("local[" + cores + "]") // local, with 4 worker cores per default
     val sparkSession = sparkBuilder.getOrCreate()
 
     // Set the default number of shuffle partitions to 5 (default is 200, which is too high for local deployment)
@@ -144,13 +158,13 @@ object SparkIND extends App {
     //------------------------------------------------------------------------------------------------------------------
 
     val files = List(
-//      "src/main/resources/TPCH/tpch_customer.csv"
-//      , "src/main/resources/TPCH/tpch_lineitem.csv"
-       "src/main/resources/TPCH/tpch_nation.csv"
-//      , "src/main/resources/TPCH/tpch_orders.csv"
-//      , "src/main/resources/TPCH/tpch_part.csv"
-//      , "src/main/resources/TPCH/tpch_region.csv"
-      , "src/main/resources/TPCH/tpch_supplier.csv"
+//      file_path + "/tpch_customer.csv"
+//      , file_path + "/tpch_lineitem.csv"
+        file_path + "/tpch_nation.csv"
+//      , file_path + "/tpch_orders.csv"
+//      , file_path + "/tpch_part.csv"
+//      , file_path + "/tpch_region.csv"
+      , file_path + "/tpch_supplier.csv"
     )
 
     import sparkSession.implicits._
