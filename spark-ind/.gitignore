@@ -7,3 +7,6 @@ TPCH/
 
 # compiled stuff
 target/
+out/
+project/
+dependency-reduced-pom.xml
