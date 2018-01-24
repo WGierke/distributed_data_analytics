@@ -1,11 +1,11 @@
-package com.github.wgierke.spark_ind
+package com.github.wgierke.finder
 
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql._
 
 import scala.collection.mutable.ListBuffer
 
-object INDFinder extends App {
+object fINDer extends App {
 
   override def main(args: Array[String]): Unit = {
 
